@@ -4,6 +4,16 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def create_default_agency(apps, schema_editor):
+    CollectionAgency = apps.get_model("accounts", "CollectionAgency")
+    CollectionAgency.objects.create(name="Default Agency")
+
+
+def delete_default_agency(apps, schema_editor):
+    CollectionAgency = apps.get_model("accounts", "CollectionAgency")
+    CollectionAgency.objects.filter(name="Default Agency").delete()
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -80,7 +90,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("balance", models.DecimalField(decimal_places=2, max_digits=10)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("client_reference_no", models.CharField(max_length=64)),
                 ("status", models.CharField(max_length=32)),
@@ -98,4 +108,5 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
+        migrations.RunPython(create_default_agency, delete_default_agency),
     ]

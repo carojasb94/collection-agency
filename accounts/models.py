@@ -35,24 +35,22 @@ class Consumer(models.Model):
     def __str__(self):
         return self.name
 
-    pass
-
 
 class Debt(models.Model):
     """The amount owed by one or more consumers"""
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    balance = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=32)
+    client_reference_no = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="debts")
     consumers = models.ManyToManyField(Consumer, related_name="debts")
-    client_reference_no = models.CharField(max_length=64)
-    status = models.CharField(max_length=32)
 
     def clean(self):
-        """Validates that the amount is greater than zero."""
-        if self.amount <= 0:
-            raise ValidationError("Amount must be greater than zero.")
+        """Validates that the balance is greater than zero."""
+        if self.balance <= 0:
+            raise ValidationError("balance must be greater than zero.")
 
     def __str__(self):
-        return f"Debt #{self.id} (${self.amount})"
+        return f"Debt #{self.id} (${self.balance})"

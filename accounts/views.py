@@ -7,8 +7,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import ListAPIView
 
-from .models import Client, Consumer, Debt
+from .models import CollectionAgency, Client, Consumer, Debt
 from .serializers import DebtSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AccountListView(ListAPIView):
@@ -52,8 +55,12 @@ def upload_csv(request):
         csv_file = request.FILES["file"]
         decoded_file = csv_file.read().decode("utf-8")
         reader = csv.DictReader(io.StringIO(decoded_file))
-
         created = 0
+        duplicated = 0
+        failed = 0
+        # if agency_id is not specified, added to the default one
+        default_agency = CollectionAgency.objects.first()
+
         for row in reader:
             client_ref = row["client reference no"].strip()
             balance = row["balance"]
@@ -61,14 +68,29 @@ def upload_csv(request):
             name = row["consumer name"].strip()
             address = row["consumer address"].strip()
             ssn = row["ssn"].strip()
-
+            agency_id = row.get("agency_id")
+            if agency_id:
+                _agency = CollectionAgency.objects.filter(id=agency_id)
+                if not _agency:
+                    print(f"Agency with ID {agency_id} not found.")
+                    # logger.error(f"Agency with ID {agency_id} not found.")
+                    failed += 1
+                    continue
+            else:
+                _agency = default_agency
             # Get or create the client
-            client, _ = Client.objects.get_or_create(
-                reference_no=client_ref, defaults={"name": f"Client {client_ref}"}
+            client, exists = Client.objects.get_or_create(
+                reference_no=client_ref,
+                defaults={
+                    "name": f"Client {client_ref}",
+                    "agency": _agency,
+                },
             )
+            if not exists:
+                print(f"CLIENT already exists with SNN:{ssn}")
 
             # Get or create the consumer
-            consumer, _ = Consumer.objects.get_or_create(
+            consumer, exists = Consumer.objects.get_or_create(
                 ssn=ssn,
                 defaults={
                     "name": name,
@@ -76,10 +98,12 @@ def upload_csv(request):
                     "is_entity": False,
                 },
             )
+            if not exists:
+                print(f"Consumer already exists with SNN:{ssn}")
 
             # Create the debt
             debt = Debt.objects.create(
-                amount=balance,
+                balance=balance,
                 status=status,
                 client_reference_no=client_ref,
                 client=client,
@@ -87,7 +111,17 @@ def upload_csv(request):
             debt.consumers.add(consumer)
             created += 1
 
-        return JsonResponse({"message": f"{created} debts created."})
+        return JsonResponse(
+            {
+                "status": "success",
+                "data": {
+                    "created": created,
+                    "duplicated": duplicated,
+                    "failed": failed,
+                },
+                "message": "File processed.",
+            }
+        )
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
