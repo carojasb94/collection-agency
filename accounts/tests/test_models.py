@@ -3,7 +3,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from .models import Client, CollectionAgency, Consumer, Debt
+from accounts.models import Client, CollectionAgency, Consumer, Debt
 
 
 class CollectionAgencyTestCase(TestCase):
@@ -45,28 +45,28 @@ class DebtTestCase(TestCase):
         consumer_1 = Consumer.objects.create(name="John Doe", is_entity=False)
         consumer_2 = Consumer.objects.create(name="Jane Smith", is_entity=False)
 
-        debt = Debt.objects.create(amount=150.00, client=client)
+        debt = Debt.objects.create(balance=150.00, client=client)
         debt.consumers.add(consumer_1, consumer_2)  # Add multiple consumers
 
-        self.assertEqual(debt.amount, 150.00)
+        self.assertEqual(debt.balance, 150.00)
         self.assertEqual(debt.client, client)
         self.assertIn(consumer_1, debt.consumers.all())
         self.assertIn(consumer_2, debt.consumers.all())
         self.assertEqual(debt.consumers.count(), 2)
 
-    def test_debt_amount_validation(self):
-        """Test for Debt amount validation (should raise error if amount is zero or negative)."""
+    def test_debt_balance_validation(self):
+        """Test for Debt balance validation (should raise error if balance is zero or negative)."""
         agency = CollectionAgency.objects.create(name="Agency A")
         client = Client.objects.create(name="Client 1", agency=agency)
 
-        # Test for invalid (negative) amount
+        # Test for invalid (negative) balance
         with self.assertRaises(ValidationError):
-            debt = Debt(amount=-1, client=client)
+            debt = Debt(balance=-1, client=client)
             debt.clean()  # Manually call clean to validate
 
-        # Test for invalid (zero) amount
+        # Test for invalid (zero) balance
         with self.assertRaises(ValidationError):
-            debt = Debt(amount=0, client=client)
+            debt = Debt(balance=0, client=client)
             debt.clean()  # Manually call clean to validate
 
 
@@ -77,20 +77,20 @@ class RelationshipsTestCase(TestCase):
         agency = CollectionAgency.objects.create(name="Agency A")
         client = Client.objects.create(name="Client 1", agency=agency)
         consumer_1 = Consumer.objects.create(name="John Doe", is_entity=False)
-        debt = Debt.objects.create(amount=100.00, client=client)
+        debt = Debt.objects.create(balance=100.00, client=client)
         debt.consumers.add(consumer_1)
 
         # Test if client has the correct debts
         self.assertEqual(client.debts.count(), 1)
-        self.assertEqual(client.debts.first().amount, 100.00)
+        self.assertEqual(client.debts.first().balance, 100.00)
 
     def test_consumer_has_debts(self):
         agency = CollectionAgency.objects.create(name="Agency A")
         client = Client.objects.create(name="Client 1", agency=agency)
         consumer_1 = Consumer.objects.create(name="John Doe", is_entity=False)
-        debt = Debt.objects.create(amount=100.00, client=client)
+        debt = Debt.objects.create(balance=100.00, client=client)
         debt.consumers.add(consumer_1)
 
         # Test if consumer is related to the debt
         self.assertEqual(consumer_1.debts.count(), 1)
-        self.assertEqual(consumer_1.debts.first().amount, 100.00)
+        self.assertEqual(consumer_1.debts.first().balance, 100.00)
