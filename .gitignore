@@ -173,10 +173,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# 
+#
 .idea
 #
 .vscode
 
-# 
+#
 db.sqlite3
