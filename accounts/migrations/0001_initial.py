@@ -89,9 +89,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "consumers",
-                    models.ManyToManyField(
-                        related_name="debts", to="accounts.consumer"
-                    ),
+                    models.ManyToManyField(related_name="debts", to="accounts.consumer"),
                 ),
             ],
         ),

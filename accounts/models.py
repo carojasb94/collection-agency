@@ -17,9 +17,7 @@ class Client(models.Model):
     """Organization that hires a collection agency to collect debt on their behalf."""
 
     name = models.CharField(max_length=255)
-    agency = models.ForeignKey(
-        CollectionAgency, on_delete=models.CASCADE, related_name="clients"
-    )
+    agency = models.ForeignKey(CollectionAgency, on_delete=models.CASCADE, related_name="clients")
 
     def __str__(self):
         return self.name

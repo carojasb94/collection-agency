@@ -3,7 +3,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from .models import Client, CollectionAgency, Consumer, Debt
+from accounts.models import Client, CollectionAgency, Consumer, Debt
 
 
 class CollectionAgencyTestCase(TestCase):
