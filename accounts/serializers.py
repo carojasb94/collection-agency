@@ -14,4 +14,4 @@ class DebtSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Debt
-        fields = ["id", "amount", "status", "client", "consumers"]
+        fields = ["id", "balance", "status", "client", "consumers"]

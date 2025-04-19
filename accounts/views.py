@@ -7,15 +7,17 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.generics import ListAPIView
 
-from .models import CollectionAgency, Client, Consumer, Debt
-from .serializers import DebtSerializer
+from accounts.models import CollectionAgency, Client, Consumer, Debt
+from accounts.serializers import DebtSerializer
 import logging
+from accounts.pagination import CustomLimitOffsetPagination
 
 logger = logging.getLogger(__name__)
 
 
 class AccountListView(ListAPIView):
     serializer_class = DebtSerializer
+    pagination_class = CustomLimitOffsetPagination
 
     def get_queryset(self):
         queryset = Debt.objects.select_related("client__agency").prefetch_related("consumers").all()
@@ -29,10 +31,10 @@ class AccountListView(ListAPIView):
             queryset = queryset.filter(client__agency_id=agency_id)
 
         if min_balance:
-            queryset = queryset.filter(amount__gte=min_balance)
+            queryset = queryset.filter(balance__gte=min_balance)
 
         if max_balance:
-            queryset = queryset.filter(amount__lte=max_balance)
+            queryset = queryset.filter(balance__lte=max_balance)
 
         if status:
             queryset = queryset.filter(status=status)
