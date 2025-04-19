@@ -26,9 +26,17 @@ abcd1234,200.00,PAID_IN_FULL,Jane Smith,"456 Elm St, Town",222-22-2222
     assert response.status_code == 200
     assert "2 debts created" in response.json()["message"]
 
+    client_obj = Client.objects.get(reference_no="abcd1234")
+    assert client_obj.name == "Client abcd1234"
+
     assert Client.objects.count() == 1
     assert Consumer.objects.count() == 2
     assert Debt.objects.count() == 2
+
+    debt = Debt.objects.first()
+    assert debt.status in ["IN_COLLECTION", "PAID_IN_FULL"]
+    assert debt.client == client_obj
+    assert debt.consumers.exists()
 
 
 @pytest.mark.django_db
@@ -47,7 +55,6 @@ def test_upload_csv_invalid_method(client):
 
 @pytest.mark.django_db
 def test_upload_csv_invalid_csv(client):
-    # Invalid headers
     csv_content = "wrong,header,here\nbad,data,here"
     file = io.StringIO(csv_content)
     file.name = "bad.csv"

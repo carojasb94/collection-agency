@@ -55,19 +55,35 @@ def upload_csv(request):
 
         created = 0
         for row in reader:
-            client_ref = row["client reference no"]
+            client_ref = row["client reference no"].strip()
             balance = row["balance"]
-            status = row["status"]
-            name = row["consumer name"]
-            address = row["consumer address"]
-            ssn = row["ssn"]
+            status = row["status"].strip()
+            name = row["consumer name"].strip()
+            address = row["consumer address"].strip()
+            ssn = row["ssn"].strip()
 
-            client, _ = Client.objects.get_or_create(reference_no=client_ref)
-            consumer, _ = Consumer.objects.get_or_create(
-                ssn=ssn, defaults={"name": name, "address": address}
+            # Get or create the client
+            client, _ = Client.objects.get_or_create(
+                reference_no=client_ref, defaults={"name": f"Client {client_ref}"}
             )
-            debt = Debt.objects.create(amount=balance, status=status)
-            debt.clients.add(client)
+
+            # Get or create the consumer
+            consumer, _ = Consumer.objects.get_or_create(
+                ssn=ssn,
+                defaults={
+                    "name": name,
+                    "address": address,
+                    "is_entity": False,
+                },
+            )
+
+            # Create the debt
+            debt = Debt.objects.create(
+                amount=balance,
+                status=status,
+                client_reference_no=client_ref,
+                client=client,
+            )
             debt.consumers.add(consumer)
             created += 1
 

@@ -1,0 +1,49 @@
+# Python bytecode files
+**/__pycache__
+**/*.pyc
+**/*.pyo
+
+# Django migration files (optional)
+**/migrations/
+
+# Local environment files
+.env
+.env.*
+.venv
+venv/
+*.env
+
+# IDE or editor folders
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+*.log
+
+# Temporary files
+*.bak
+*.swp
+*.swo
+
+# Test coverage reports
+.coverage
+*.coveragerc
+
+# Distribution / packaging files
+*.tar.gz
+*.tgz
+*.zip
+
+# Node modules (if using Node.js for frontend)
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Docker files
+Dockerfile*
+.dockerignore
+
