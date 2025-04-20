@@ -42,13 +42,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Pytest
-        run: pip install pytest
+      - name: Install Pytest and Coverage
+        run: pip install pytest coverage
 
       - name: Run migrations
         run: |
           python manage.py migrate
 
-      - name: Run tests
+
+      - name: Run tests with coverage
         run: |
-          python manage.py test -v 2
+          coverage run manage.py test -v 2
+
+          # Generate coverage report in the terminal
+          coverage report --fail-under=90
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: result.log
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml

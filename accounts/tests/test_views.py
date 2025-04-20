@@ -159,8 +159,8 @@ abcd1234,200.00,PAID_IN_FULL,Jane Smith,"456 Elm St, Town",222-22-2222
         # Mock CSV content, with 1 valid row and one with invalid agency_id
         csv_content = """client reference no,balance,status,consumer name,consumer address,ssn,agency_id
 abcd1234,100.50,IN_COLLECTION,John Doe,"123 Main St, City",111-11-1111,
-abcd1234,100.50,IN_COLLECTION,John Doe,"123 Main St, City",111-11-1111,{agency_id_valid}
-abcd5678,200.00,PAID_IN_FULL,Jane Smith,"456 Elm St, Town",222-22-2222,999999
+abcd2345,100.50,IN_COLLECTION,John Doe,"123 Main St, City",222-22-2222,{agency_id_valid}
+abcd5678,200.00,PAID_IN_FULL,Jane Smith,"456 Elm St, Town",333-33-3333,999999
 """.format(
             agency_id_valid=self.agency.id
         )  # Using the valid agency ID created in setup
@@ -186,14 +186,18 @@ abcd5678,200.00,PAID_IN_FULL,Jane Smith,"456 Elm St, Town",222-22-2222,999999
         self.assertEqual(data["data"]["failed"], 1)  # 1 failed due to invalid agency_id
 
         # Verify that the Client, Consumer, and Debt objects were created correctly
-        self.assertEqual(Client.objects.count(), 2)
+        self.assertEqual(ClientModel.objects.count(), 2)
         self.assertEqual(Consumer.objects.count(), 2)
         self.assertEqual(Debt.objects.count(), 2)
 
+        # Check client with no agency_id specified is related with the default agency
+        client_valid = ClientModel.objects.get(reference_no="abcd1234")
+        self.assertEqual(client_valid.agency, CollectionAgency.objects.first())
+
         # Check that the client with a valid agency_id has the correct agency assigned
-        client_valid = Client.objects.get(reference_no="abcd1234")
+        client_valid = ClientModel.objects.get(reference_no="abcd2345")
         self.assertEqual(client_valid.agency, self.agency)
 
         # Verify client with the wrong agency_id was not created
-        client_invalid = Client.objects.filter(reference_no="abcd5678").first()
+        client_invalid = ClientModel.objects.filter(reference_no="abcd5678").first()
         self.assertIsNone(client_invalid)
