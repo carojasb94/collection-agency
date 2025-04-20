@@ -26,7 +26,12 @@ SECRET_KEY = "django-insecure-t_f99kxv1ra=_-7egx0@a@1crw@ex(&$4*+xl22o46jy+49df7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = [
+    # @TODO - use env.vars for allowed hosts instead of wildcard or hardcoded values
+    "collection-agency-dev-142187143803.us-central1.run.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 # Application definition
 
