@@ -26,5 +26,6 @@ steps:
         'us-central1',
         '--platform',
         'managed',
-        '--allow-unauthenticated'
+        '--allow-unauthenticated',
+        '--config', 'cloudrun.yaml'
       ]

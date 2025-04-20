@@ -14,17 +14,17 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-t_f99kxv1ra=_-7egx0@a@1crw@ex(&$4*+xl22o46jy+49df7"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECRET_KEY = "django-insecure-t_f99kxv1ra=_-7egx0@a@1crw@ex(&$4*+xl22o46jy+49df7"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "unsafe-key")
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+# DEBUG = True
 
 ALLOWED_HOSTS: list[str] = [
     # @TODO - use env.vars for allowed hosts instead of wildcard or hardcoded values
@@ -34,18 +34,25 @@ ALLOWED_HOSTS: list[str] = [
 ]
 
 # Application definition
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+THIRD_PARTY_APPS = [
     "django_extensions",
     "rest_framework",
+]
+
+MY_APPS = [
     "accounts",
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -90,7 +97,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -109,19 +115,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = "/static/"
 
 # The absolute path to the directory where collectstatic will store static files for production
