@@ -72,7 +72,7 @@ def upload_csv(request):
             ssn = row["ssn"].strip()
             agency_id = row.get("agency_id")
             if agency_id:
-                _agency = CollectionAgency.objects.filter(id=agency_id)
+                _agency = CollectionAgency.objects.filter(id=agency_id).first()
                 if not _agency:
                     print(f"Agency with ID {agency_id} not found.")
                     # logger.error(f"Agency with ID {agency_id} not found.")
@@ -81,18 +81,16 @@ def upload_csv(request):
             else:
                 _agency = default_agency
             # Get or create the client
-            client, exists = Client.objects.get_or_create(
+            client, _ = Client.objects.get_or_create(
                 reference_no=client_ref,
                 defaults={
                     "name": f"Client {client_ref}",
                     "agency": _agency,
                 },
             )
-            if not exists:
-                print(f"CLIENT already exists with SNN:{ssn}")
 
             # Get or create the consumer
-            consumer, exists = Consumer.objects.get_or_create(
+            consumer, _ = Consumer.objects.get_or_create(
                 ssn=ssn,
                 defaults={
                     "name": name,
@@ -100,8 +98,6 @@ def upload_csv(request):
                     "is_entity": False,
                 },
             )
-            if not exists:
-                print(f"Consumer already exists with SNN:{ssn}")
 
             # Create the debt
             debt = Debt.objects.create(
