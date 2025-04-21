@@ -70,6 +70,7 @@ jobs:
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
-            --quiet
-
-
+            --add-cloudsql-instances=collection-agency-dev:us-central1:collectionagency-db \
+            --service-account=github-actions-sa@collection-agency-dev.iam.gserviceaccount.com
+      # --update-env-vars=DB_NAME=collectionagency-db,DB_USER=thrasher,DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_HOST=/cloudsql/collection-agency-dev:us-central1:collectionagency-db
+      # --quiet

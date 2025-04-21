@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y \
     libpq-dev gcc netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
+
+USER root
+RUN mkdir /cloudsql
+
 # Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt

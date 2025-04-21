@@ -8,14 +8,28 @@ DEBUG = True
 
 print("Using LOCAL settings")
 
-# docker-compose db
+# # docker-compose db
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "HOST": os.environ["DB_HOST"],
+#         "PORT": os.environ.get("DB_PORT", "5432"),
+#         "NAME": os.environ["DB_NAME"],
+#         "USER": os.environ["DB_USER"],
+#         "PASSWORD": os.environ["DB_PASSWORD"],
+#     }
+# }
+
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": os.environ["DB_HOST"],
-        "PORT": os.environ.get("DB_PORT", "5432"),
-        "NAME": os.environ["DB_NAME"],
-        "USER": os.environ["DB_USER"],
-        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": "localhost",
+        "PORT": "5432",
+        "NAME": "collectionagency",
+        "USER": "postgres",
+        # "USER": "thrasher",
+        "PASSWORD": "LVIb916LN&2B3",
+        # "PASSWORD": "newpassword",
     }
 }
