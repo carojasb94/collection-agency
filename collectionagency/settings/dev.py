@@ -6,15 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ALLOWED_HOSTS = [
-#     "collection-agency-dev-142187143803.us-central1.run.app"
-# ]
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
-DEBUG = True
-
-print("Using DEV settings")
-print("ENV VARS: ", os.environ)
-print("allowed hosts: ", ALLOWED_HOSTS)
+DEBUG = False
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
