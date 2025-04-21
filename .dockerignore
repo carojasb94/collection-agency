@@ -4,7 +4,7 @@
 **/*.pyo
 
 # Django migration files (optional)
-**/migrations/
+# **/migrations/
 
 # Local environment files
 .env
