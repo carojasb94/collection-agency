@@ -26,7 +26,11 @@ jobs:
 
     env:
       DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
-      DEBUG: 0
+      DB_NAME: test_db
+      DB_USER: test_user
+      DB_PASSWORD: test_pass
+      DB_HOST: localhost
+      DB_PORT: 5432
 
     steps:
       - name: Checkout code

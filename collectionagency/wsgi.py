@@ -8,9 +8,18 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
+import logging
+from dotenv import load_dotenv
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "collectionagency.settings")
+logger = logging.getLogger(__name__)
+load_dotenv()
+
+
+ENV = os.getenv("ENV", "dev")
+settings_module = f"collectionagency.settings.{ENV}"
+
+logger.info(f"Loading {settings_module} config.")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
 
 application = get_wsgi_application()
