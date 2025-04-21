@@ -80,6 +80,92 @@ class AccountListViewTests(TestCase):
         self.assertEqual(len(response.data["results"]), 1)
         self.assertIn("Alice", response.data["results"][0]["consumers"][0]["name"])
 
+    def test_filter_by_min_balance_no_match(self):
+        """Should return no debts if min_balance is higher than any debt balance."""
+        response = self.client.get(self.url, {"min_balance": 250})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_filter_by_max_balance_no_match(self):
+        """Should return no debts if max_balance is lower than any debt balance."""
+        response = self.client.get(self.url, {"max_balance": 50})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_filter_by_status_no_match(self):
+        """Should return no debts if status doesn't match any."""
+        response = self.client.get(self.url, {"status": "NON_EXISTENT_STATUS"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_filter_by_consumer_name_case_insensitive(self):
+        """Should match consumer name with different casing."""
+        response = self.client.get(self.url, {"consumer_name": "ALICE"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertIn("Alice", response.data["results"][0]["consumers"][0]["name"])
+
+    def test_filter_by_consumer_name_no_match(self):
+        """Should return no debts if consumer name doesn't match any."""
+        response = self.client.get(self.url, {"consumer_name": "Charlie"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_filter_by_agency_id_no_match(self):
+        """Should return no debts if agency_id does not match any."""
+        response = self.client.get(self.url, {"agency_id": 999})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
+    def test_filter_by_min_and_max_balance(self):
+        """Should return debts between min and max balance inclusive."""
+        response = self.client.get(self.url, {"min_balance": 100, "max_balance": 150})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["balance"], "100.00")
+
+    def test_filter_by_status_and_agency_id(self):
+        """Should return debts matching both status and agency_id."""
+        response = self.client.get(
+            self.url, {"status": "PAID_IN_FULL", "agency_id": self.agency.id}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["status"], "PAID_IN_FULL")
+
+    def test_filter_by_all_fields_matching(self):
+        """Should return the correct debt when all filters match."""
+        response = self.client.get(
+            self.url,
+            {
+                "min_balance": 90,
+                "max_balance": 150,
+                "consumer_name": "Alice",
+                "status": "IN_COLLECTION",
+                "agency_id": self.agency.id,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["balance"], "100.00")
+        self.assertEqual(response.data["results"][0]["status"], "IN_COLLECTION")
+        self.assertIn("Alice", response.data["results"][0]["consumers"][0]["name"])
+
+    def test_filter_by_all_fields_no_match(self):
+        """Should return no debts when all filters apply but no match exists."""
+        response = self.client.get(
+            self.url,
+            {
+                "min_balance": 300,
+                "max_balance": 400,
+                "consumer_name": "Zoe",
+                "status": "IN_COLLECTION",
+                "agency_id": self.agency.id,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["results"]), 0)
+
 
 class UploadCSVTests(TestCase):
     def setUp(self):
