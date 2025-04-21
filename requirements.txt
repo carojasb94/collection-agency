@@ -56,3 +56,4 @@ typing_extensions==4.13.2
 urllib3==2.2.3
 virtualenv==20.30.0
 wcwidth==0.2.13
+whitenoise==6.9.0
